@@ -2,7 +2,7 @@
   (:require
     [syncrate-kee-frame.middleware :as middleware]
     [syncrate-kee-frame.layout :refer [error-page]]
-    [syncrate-kee-frame.routes.home :refer [home-routes]]
+    [syncrate-kee-frame.routes.home :refer [home-routes home-page]]
     [syncrate-kee-frame.routes.services :refer [service-routes]]
     [syncrate-kee-frame.routes.oauth :refer [oauth-routes]]
     [reitit.swagger-ui :as swagger-ui]
@@ -35,7 +35,8 @@
           (wrap-webjars (constantly nil)))
         (ring/create-default-handler
           {:not-found
-           (constantly (error-page {:status 404, :title "404 - Page not found"}))
+           (constantly (home-page {})) ; hash-less frontend navigation
+          ;  (constantly (error-page {:status 404, :title "404 - Page not found"}))
            :method-not-allowed
            (constantly (error-page {:status 405, :title "405 - Not allowed"}))
            :not-acceptable

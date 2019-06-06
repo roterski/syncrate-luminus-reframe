@@ -46,7 +46,7 @@
     (rf/clear-subscription-cache!)
     (kf/start! {:debug?         (boolean debug?)
                 :routes         routing/routes
-                :hash-routing?  true
+                :hash-routing?  false
                 :initial-db     {}
                 :root-component [view/root-component]})))
 
