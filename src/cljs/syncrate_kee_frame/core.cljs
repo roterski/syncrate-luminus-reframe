@@ -6,7 +6,7 @@
     [syncrate-kee-frame.ajax :as ajax]
     [syncrate-kee-frame.routing :as routing]
     [syncrate-kee-frame.view :as view]
-    [syncratek-kee-frame.db :refer [initial-db]]))
+    [syncrate-kee-frame.db :refer [initial-db]]))
 
 
 (rf/reg-event-fx
