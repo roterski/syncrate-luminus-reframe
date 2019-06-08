@@ -16,3 +16,6 @@ package.json
 shadow-cljs.edn
 /node_modules
 /log
+/.idea
+syncrate-kee-frame.iml
+.DS_Store
