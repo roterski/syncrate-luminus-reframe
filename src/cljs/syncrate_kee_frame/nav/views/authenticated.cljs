@@ -12,4 +12,6 @@
              :justify-content "flex-end"
              :py 1}
      (for [{:keys [title page]} nav-items]
-       [nav-item title page])]))
+       [nav-item {:key page
+                  :page page
+                  :title title}])]))

@@ -3,7 +3,7 @@
             [re-frame.core :as rf]
             [kee-frame.core :as kf]))
 
-(defn nav-item [title page]
+(defn nav-item [{:keys [title page]}]
   (let [is-active (= page @(rf/subscribe [:nav/page]))]
     [:> Box {:href   (kf/path-for [page])
              :as "a"
