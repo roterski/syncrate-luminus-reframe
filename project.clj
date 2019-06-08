@@ -78,7 +78,12 @@
      :output-dir "target/cljsbuild/public/js"
      :asset-path "/js"
      :modules {:app {:entries [syncrate-kee-frame.app]}}
-     :devtools {:watch-dir "resources/public"}}
+     :dev {:compiler-options {:closure-defines {re-frame.trace/trace-enabled? true
+                                                day8.re-frame.tracing/trace-enabled? true}}}
+     :devtools {:watch-dir "resources/public"
+                :http-root   "public"
+                :http-port   3000
+                :preloads    [day8.re-frame-10x.preload]}}
     :test
     {:target :node-test
      :output-to "target/test/test.js"
@@ -90,7 +95,10 @@
              [react-dom "16.8.6"]
              ["@smooth-ui/core-sc" "9.0.2"]
              [styled-components "^4.1.2"]
-             [styled-icons "^5.4.0"]]
+             [styled-icons "^5.4.0"]
+             ["highlight.js" "^9.15.8"]
+             [react-flip-move  "^3.0.3"]
+             ["react-highlight.js" "^1.0.7"]]
 
   :profiles
   {:uberjar {:omit-source true
@@ -115,6 +123,8 @@
                                  [pjstadig/humane-test-output "0.9.0"]
                                  [prone "1.6.3"]
                                  [re-frisk "0.5.4.1"]
+                                 [day8.re-frame/re-frame-10x "0.4.0"]
+                                 [re-frame "0.10.5"]
                                  [ring/ring-devel "1.7.1"]
                                  [ring/ring-mock "0.4.0"]]
                   :plugins      [[com.jakemccrary/lein-test-refresh "0.24.1"]]
