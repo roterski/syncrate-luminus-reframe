@@ -5,7 +5,8 @@
     [ajax.core :as http]
     [syncrate-kee-frame.ajax :as ajax]
     [syncrate-kee-frame.routing :as routing]
-    [syncrate-kee-frame.view :as view]))
+    [syncrate-kee-frame.view :as view]
+    [syncratek-kee-frame.db :refer [initial-db]]))
 
 
 (rf/reg-event-fx
@@ -43,11 +44,11 @@
 (defn ^:dev/after-load mount-components
   ([] (mount-components true))
   ([debug?]
-    (rf/clear-subscription-cache!)
-    (kf/start! {:debug?         (boolean debug?)
+   (rf/clear-subscription-cache!)
+   (kf/start! {:debug?         (boolean debug?)
                 :routes         routing/routes
                 :hash-routing?  false
-                :initial-db     {}
+                :initial-db     initial-db
                 :root-component [view/root-component]})))
 
 (defn init! [debug?]

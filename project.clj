@@ -83,11 +83,14 @@
     {:target :node-test
      :output-to "target/test/test.js"
      :autorun true}}}
-  
+
   :npm-deps [[shadow-cljs "2.8.31"]
              [create-react-class "15.6.3"]
              [react "16.8.6"]
-             [react-dom "16.8.6"]]
+             [react-dom "16.8.6"]
+             ["@smooth-ui/core-sc" "9.0.2"]
+             [styled-components "^4.1.2"]
+             [styled-icons "^5.4.0"]]
 
   :profiles
   {:uberjar {:omit-source true
@@ -123,9 +126,9 @@
                   :injections [(require 'pjstadig.humane-test-output)
                                (pjstadig.humane-test-output/activate!)]}
    :project/test {:jvm-opts ["-Dconf=test-config.edn"]
-                  :resource-paths ["env/test/resources"]
+                  :resource-paths ["env/test/resources"]}
                   
                   
-                  }
+
    :profiles/dev {}
    :profiles/test {}})

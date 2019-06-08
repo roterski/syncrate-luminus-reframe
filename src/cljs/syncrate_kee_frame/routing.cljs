@@ -4,7 +4,9 @@
 
 (def routes
   [["/" :home]
-   ["/about" :about]])
+   ["/about" :about]
+   ["/posts" :posts]
+   ["/posts/"]])
 
 (rf/reg-sub
   :nav/route
