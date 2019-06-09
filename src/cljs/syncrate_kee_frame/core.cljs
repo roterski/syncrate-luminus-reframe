@@ -6,7 +6,14 @@
     [syncrate-kee-frame.ajax :as ajax]
     [syncrate-kee-frame.routing :as routing]
     [syncrate-kee-frame.view :as view]
-    [syncrate-kee-frame.db :refer [initial-db]]))
+    [syncrate-kee-frame.db :refer [initial-db]]
+    ;; -- posts --
+    [syncrate-kee-frame.posts.subs]
+    [syncrate-kee-frame.posts.events]
+    [syncrate-kee-frame.posts.controllers]
+    ;; -- errors --
+    [syncrate-kee-frame.errors.subs]
+    [syncrate-kee-frame.errors.events]))
 
 
 (rf/reg-event-fx
@@ -17,6 +24,16 @@
   ::about-controller
   {:params (constantly true)
    :start  [::load-about-page]})
+
+
+;(rf/reg-event-fx
+;  ::load-posts-page
+;  (constantly nil))
+;
+;(kf/reg-controller
+;  ::posts-controller
+;  {:params (constantly true)
+;   :start  [::load-posts-page]})
 
 (rf/reg-sub
   :docs

@@ -1,7 +1,9 @@
 (ns syncrate-kee-frame.db)
 
 (def initial-db
-  {:posts
+  {:errors {}
+   :active-post :1
+   :posts
      {:1 {:id 1
           :title "Hello world"
           :profile-id :1
