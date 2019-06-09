@@ -83,7 +83,7 @@
      :devtools {:watch-dir "resources/public"
                 :http-root   "public"
                 :http-port   3000
-                :preloads    [day8.re-frame-10x.preload]}}
+                :preloads    [devtools.preload day8.re-frame-10x.preload]}}
     :test
     {:target :node-test
      :output-to "target/test/test.js"
@@ -124,6 +124,7 @@
                                  [prone "1.6.3"]
                                  [re-frisk "0.5.4.1"]
                                  [day8.re-frame/re-frame-10x "0.4.0"]
+                                 [day8.re-frame/tracing "0.5.1"]
                                  [re-frame "0.10.5"]
                                  [ring/ring-devel "1.7.1"]
                                  [ring/ring-mock "0.4.0"]]
