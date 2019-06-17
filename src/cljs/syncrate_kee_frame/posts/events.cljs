@@ -48,8 +48,8 @@
 (reg-event-db
   :upsert-post
   (fn-traced [db [_ post]]
-    (def captured-post post)
-    (let [post-id (keyword (str (or (:id post) (random-uuid))))
-          post-data (merge {:id post-id} post)]
+    (let [post (w/keywordize-keys post)
+          post-id (keyword (str (or (:id post) (random-uuid))))
+          post-data (assoc post :id post-id)]
       (-> db
           (update-in [:posts post-id] merge post-data)))))
