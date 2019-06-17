@@ -9,6 +9,7 @@
     [reitit.ring.middleware.parameters :as parameters]
     [syncrate-kee-frame.middleware.formats :as formats]
     [syncrate-kee-frame.middleware.exception :as exception]
+    [syncrate-kee-frame.posts.posts :refer [create-post index-posts]]
     [ring.util.http-response :refer :all]
     [clojure.java.io :as io]))
 
@@ -41,6 +42,9 @@
 
     ["/swagger.json"
      {:get (swagger/create-swagger-handler)}]
+    ["/posts"
+     {:get index-posts
+      :post create-post}]
 
     ["/api-docs/*"
      {:get (swagger-ui/create-swagger-ui-handler

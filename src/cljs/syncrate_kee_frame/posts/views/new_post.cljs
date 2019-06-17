@@ -15,9 +15,9 @@
         save (fn [event {:keys [title body]}]
                (.preventDefault event)
                (when (and (not (str/blank? title))
-                          (not (str/blank? body)))))]
-                 ;(rf/dispatch [:upsert-post values]
-                 ;               (reset! values initial-values)))
+                          (not (str/blank? body)))
+                 (rf/dispatch [:create-post @values]
+                   (reset! values initial-values))))]
     (fn []
       [:> Box
        [page-nav {:left :posts

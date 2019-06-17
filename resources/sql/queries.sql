@@ -19,3 +19,15 @@ WHERE id = :id
 -- :doc deletes a user record given the id
 DELETE FROM users
 WHERE id = :id
+
+-- :name create-post! :insert :raw
+-- :doc creates a new post record
+INSERT INTO posts
+(title, body)
+VALUES (:title, :body)
+
+
+-- :name get-posts :? :*
+-- :doc retrieves all post records
+SELECT * FROM posts
+LIMIT 1000;
