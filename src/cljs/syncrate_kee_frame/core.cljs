@@ -25,16 +25,6 @@
   {:params (constantly true)
    :start  [::load-about-page]})
 
-
-;(rf/reg-event-fx
-;  ::load-posts-page
-;  (constantly nil))
-;
-;(kf/reg-controller
-;  ::posts-controller
-;  {:params (constantly true)
-;   :start  [::load-posts-page]})
-
 (rf/reg-sub
   :docs
   (fn [db _]

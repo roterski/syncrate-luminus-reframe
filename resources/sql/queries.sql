@@ -31,3 +31,8 @@ VALUES (:title, :body)
 -- :doc retrieves all post records
 SELECT * FROM posts
 LIMIT 1000;
+
+-- :name get-post :? :1
+-- :doc retrieves a post record given the id
+SELECT * FROM posts
+WHERE id = :id

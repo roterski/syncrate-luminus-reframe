@@ -3,6 +3,7 @@
             [ajax.core :as http]
             [syncrate-kee-frame.db :refer [initial-db]]
             [clojure.walk :as w]
+            [kee-frame.core :as kf]
             [day8.re-frame.tracing :refer-macros [fn-traced]]))
 
 (defn keywordize-id
@@ -14,34 +15,52 @@
                 [id (assoc v :id id)])))
        (into {})))
 
-(reg-event-db
-  :set-active-post
-  (fn-traced [db [_ [post-id]]]
-    (assoc db :active-post (keyword post-id))))
+(reg-event-fx
+  :load-posts
+  (fn-traced [_ _]
+    {:http-xhrio {:method          :get
+                  :uri             "/api/posts"
+                  :response-format (http/json-response-format)
+                  :on-success      [:posts-loaded-successfully]
+                  :on-failure      [:common/set-request-error]}}))
+
+(reg-event-fx
+  :load-post
+  (fn-traced [{:keys [db]} [_ [post-id]]]
+    {
+     :db (assoc db :active-post (keyword post-id))
+     :http-xhrio {:method :get
+                  :uri (str "/api/post/" post-id)
+                  :response-format (http/json-response-format)
+                  :on-success [:post-loaded]
+                  :on-failure [:common/set-request-error]}}))
 
 (reg-event-db
   :posts-loaded-successfully
   (fn-traced [db [_ posts]]
-    (do
-      ;(js/console.log "POSTS:")
-      (js/console.log posts)
-
-      (-> db
-        (assoc-in [:loading :posts] false)
-        (assoc-in [:posts] (keywordize-id posts))))))
+    (-> db
+      (assoc-in [:loading :posts] false)
+      (assoc-in [:posts] (keywordize-id posts)))))
 
 (reg-event-fx
   :create-post
   (fn-traced [db [_ post]]
     {:http-xhrio {:method :post
-                  :uri "api/posts"
+                  :uri "/api/posts"
                   :body (js/JSON.stringify (clj->js post))
-                  :headers (select-keys (http/json-request-format) [:content-type])
+                  :headers {:content-type "application/json"}
                   :response-format (http/json-response-format)
-                  :on-success      [:post-created-successfully]}}))
+                  :on-success      [:post-created]
+                  :on-failure      [:common/set-error]}}))
 
 (reg-event-fx
-  :post-created-successfully
+  :post-created
+  (fn-traced [db [_ response]]
+    {:dispatch [:upsert-post response]
+     :navigate-to [:posts]}))
+
+(reg-event-fx
+  :post-loaded
   (fn-traced [db [_ response]]
     {:dispatch [:upsert-post response]}))
 

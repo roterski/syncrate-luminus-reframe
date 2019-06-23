@@ -9,10 +9,27 @@
   :has-value?
   ;errors-interceptors
   (fn-traced [db [_ id]]
-             (assoc-in db [:errors id] "Can't be blank")))
+    (assoc-in db [:errors id] "Can't be blank")))
 
 (reg-event-db
   :clear-error
   ;errors-interceptors
   (fn-traced [db [_ id]]
-             (update-in db [:errors] dissoc id)))
+    (update-in db [:errors] dissoc id)))
+
+(reg-event-db
+  :common/set-error
+  (fn-traced [db [_ error]]
+    (do
+      (js/console.error error)
+      (-> db
+          (update-in [:errors] #(merge % {:error error}))))))
+
+
+(reg-event-db
+  :common/set-request-error
+  (fn-traced [db [_ error]]
+    (do
+      (js/console.error error)
+      (-> db
+          (update-in [:errors] #(merge % {:request error}))))))

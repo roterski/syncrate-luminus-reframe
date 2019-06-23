@@ -2,24 +2,16 @@
   (:require [kee-frame.core :as kf]
             [ajax.core :as http]))
 
+(kf/reg-controller
+  ::posts-controller
+  {:params (fn [{:keys [data]}]
+             (when (= (:name data) :posts)
+               true))
+   :start [:load-posts]})
 
 (kf/reg-controller
   ::post-controller
   {:params (fn [{:keys [path-params]}]
              (:post-id path-params))
    :start  (fn [_ post-id]
-             [:set-active-post [post-id]])})
-
-(kf/reg-chain
-  ::load-posts-page
-  (fn [_ _]
-    {:http-xhrio {:method          :get
-                  :uri             "api/posts"
-                  :response-format (http/json-response-format)
-                  :on-success      [:posts-loaded-successfully]
-                  :on-failure      [:common/set-error]}}))
-
-(kf/reg-controller
-  ::posts-controller
-  {:params (constantly true)
-   :start [::load-posts-page]})
+             [:load-post [post-id]])})
