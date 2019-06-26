@@ -30,17 +30,17 @@
     {
      :db (assoc db :active-post (keyword post-id))
      :http-xhrio {:method :get
-                  :uri (str "/api/post/" post-id)
+                  :uri (str "/api/posts/" post-id)
                   :response-format (http/json-response-format)
                   :on-success [:post-loaded]
                   :on-failure [:common/set-request-error]}}))
 
 (reg-event-db
   :posts-loaded-successfully
-  (fn-traced [db [_ posts]]
+  (fn-traced [db [_ response]]
     (-> db
       (assoc-in [:loading :posts] false)
-      (assoc-in [:posts] (keywordize-id posts)))))
+      (assoc-in [:posts] (keywordize-id (get response "data"))))))
 
 (reg-event-fx
   :create-post

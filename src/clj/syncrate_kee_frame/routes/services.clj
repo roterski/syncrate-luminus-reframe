@@ -39,23 +39,31 @@
    ["" {:no-doc true
         :swagger {:info {:title "my-api"
                          :description "https://cljdoc.org/d/metosin/reitit"}}}
-
     ["/swagger.json"
      {:get (swagger/create-swagger-handler)}]
-    ["/posts"
-     {:get index-posts
-      :post create-post}]
-    ["/post/:id"
-     {:get show-post}]
-
     ["/api-docs/*"
      {:get (swagger-ui/create-swagger-ui-handler
              {:url "/api/swagger.json"
               :config {:validator-url nil}})}]]
-
    ["/ping"
     {:get (constantly (ok {:message "pong"}))}]
-   
+
+   ["/posts"
+    {:swagger {:tags ["posts"]}}
+    [""
+     {:get {:summary "return list of posts"
+            :parameters {}
+            :responses {200 {:data vector?}}
+            :handler index-posts}
+
+      :post {:summary "create post"
+             :parameters {:body {:title string?
+                                 :body string?}}
+             :handler create-post}}]
+    ["/:id"
+     {:get {:summary "return single post"
+            :parameters {:path-params {:id pos-int?}}
+            :handler show-post}}]]
 
    ["/math"
     {:swagger {:tags ["math"]}}

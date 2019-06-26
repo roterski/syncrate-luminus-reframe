@@ -10,9 +10,9 @@
 
 (defn index-posts [_]
   (let [posts (db/get-posts)]
-    {:status 200, :body posts}))
+    {:status 200, :body {:data posts}}))
 
 (defn show-post [{:keys [path-params]}]
-  (let [post-id (Integer/parseInt (:id path-params))]
-    {:status 200
-     :body (db/get-post {:id post-id})}))
+ (let [post-id (Integer/parseInt (:id path-params))]
+   {:status 200
+    :body (db/get-post {:id post-id})}))
