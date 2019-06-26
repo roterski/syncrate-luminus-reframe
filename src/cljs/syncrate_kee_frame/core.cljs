@@ -7,6 +7,8 @@
     [syncrate-kee-frame.routing :as routing]
     [syncrate-kee-frame.view :as view]
     [syncrate-kee-frame.db :refer [initial-db]]
+    ;; -- auth --
+    [syncrate-kee-frame.auth.subs]
     ;; -- posts --
     [syncrate-kee-frame.posts.subs]
     [syncrate-kee-frame.posts.events]

@@ -5,7 +5,7 @@
 
 (defn nav
   []
-  ;(let [logged-in? @(rf/subscribe [:logged-in?])]
-  ;  (if logged-in?
-  [authenticated])
-      ;[public]])
+  (let [logged-in? @(rf/subscribe [:logged-in?])]
+    (if logged-in?
+      [authenticated]
+      [public])))
