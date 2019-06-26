@@ -51,15 +51,20 @@
    ["/posts"
     {:swagger {:tags ["posts"]}}
     [""
-     {:get {:summary "return list of posts"
-            :parameters {}
-            :responses {200 {:data vector?}}
-            :handler index-posts}
+     {:get  {:summary    "return list of posts"
+             :parameters {}
+             :responses  {200 {:body {:data [{:id         pos-int?
+                                              :title      string?
+                                              :body       string?
+                                              :created_at some?}]}}}
+             :handler    index-posts}
 
-      :post {:summary "create post"
+      :post {:summary    "create post"
              :parameters {:body {:title string?
-                                 :body string?}}
-             :handler create-post}}]
+                                 :body  string?}}
+             :responses  {200 {:body map?}
+                          500 {:errors map?}}
+             :handler    create-post}}]
     ["/:id"
      {:get {:summary "return single post"
             :parameters {:path-params {:id pos-int?}}

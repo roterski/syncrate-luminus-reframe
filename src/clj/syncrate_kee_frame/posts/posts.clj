@@ -4,9 +4,19 @@
             [ring.util.http-response :as response]))
 
 (defn create-post [{:keys [body-params]}]
-  (let [created-post (db/create-post! body-params)]
-    {:status 200
-     :body created-post}))
+  (try
+    (let [created-post (db/create-post! body-params)]
+      {:status 200
+       :body created-post})
+    (catch Exception e
+      (let [{id :syncrate-kee-frame/error-id
+             errors :errors} (ex-data e)]
+        (case id
+          :validation
+          (response/bad-request {:errors errors})
+          ;;else
+          (response/internal-server-error
+            {:errors {:server-error ["Failed to create post!"]}}))))))
 
 (defn index-posts [_]
   (let [posts (db/get-posts)]
