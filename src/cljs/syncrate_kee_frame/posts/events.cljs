@@ -2,9 +2,12 @@
   (:require [re-frame.core :refer [reg-event-db reg-event-fx]]
             [ajax.core :as http]
             [syncrate-kee-frame.db :refer [initial-db]]
+            [syncrate-kee-frame.spec :refer [check-spec-interceptor]]
             [clojure.walk :as w]
             [kee-frame.core :as kf]
             [day8.re-frame.tracing :refer-macros [fn-traced]]))
+
+(def posts-interceptors [check-spec-interceptor])
 
 (defn keywordize-id
   [coll]
@@ -17,6 +20,7 @@
 
 (reg-event-fx
   :load-posts
+  posts-interceptors
   (fn-traced [_ _]
     {:http-xhrio {:method          :get
                   :uri             "/api/posts"
@@ -26,6 +30,7 @@
 
 (reg-event-fx
   :load-post
+  posts-interceptors
   (fn-traced [{:keys [db]} [_ [post-id]]]
     {
      :db (assoc db :active-post (keyword post-id))
@@ -37,6 +42,7 @@
 
 (reg-event-db
   :posts-loaded-successfully
+  posts-interceptors
   (fn-traced [db [_ response]]
     (-> db
       (assoc-in [:loading :posts] false)
@@ -44,6 +50,7 @@
 
 (reg-event-fx
   :create-post
+  posts-interceptors
   (fn-traced [db [_ post]]
     {:http-xhrio {:method :post
                   :uri "/api/posts"
@@ -55,17 +62,20 @@
 
 (reg-event-fx
   :post-created
+  posts-interceptors
   (fn-traced [db [_ response]]
     {:dispatch [:upsert-post response]
      :navigate-to [:posts]}))
 
 (reg-event-fx
   :post-loaded
+  posts-interceptors
   (fn-traced [db [_ response]]
     {:dispatch [:upsert-post response]}))
 
 (reg-event-db
   :upsert-post
+  posts-interceptors
   (fn-traced [db [_ post]]
     (let [post (w/keywordize-keys post)
           post-id (keyword (str (or (:id post) (random-uuid))))
