@@ -7,7 +7,7 @@
     [ring.util.http-response :as response]))
 
 (defn home-page [request]
-  (layout/render request "home.html"))
+  (layout/render request "home.html" (select-keys env [:fb-app-id])))
 
 (defn home-routes []
   [""
