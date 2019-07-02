@@ -1,0 +1,1 @@
+DROP INDEX user_facebook_id_idx;

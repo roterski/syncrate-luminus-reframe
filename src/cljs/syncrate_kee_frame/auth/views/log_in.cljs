@@ -11,9 +11,15 @@
   (let [initial-values {:email "" :password ""}
         values (r/atom initial-values)]
     (fn []
-      [:> Row {:justify-content "center"}
+      [:> Row {:display "flex"
+               :justify-content "center"}
        [:> Col {:xs 12 :sm 6}
         [page-nav {:center "Log in"}]
+        [:> Box {:display "flex"
+                 :justify-content "center"}
+         [:> Box {:variant "primary"
+                  :on-click #(rf/dispatch [:fb-log-in])}
+          "Log in With Facebook"]]
         [form-group {:id :email
                      :label "Email"
                      :type "email"

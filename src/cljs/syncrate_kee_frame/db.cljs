@@ -2,6 +2,6 @@
 
 (def initial-db
   {:errors {}
-   :auth {:uid nil}
+   :auth nil
    :active-post nil
    :posts {}})

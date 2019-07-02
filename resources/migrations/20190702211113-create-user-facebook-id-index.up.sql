@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX user_facebook_id_idx ON users (facebook_id);

@@ -10,6 +10,7 @@
     [syncrate-kee-frame.middleware.formats :as formats]
     [syncrate-kee-frame.middleware.exception :as exception]
     [syncrate-kee-frame.posts.posts :refer [create-post index-posts show-post]]
+    [syncrate-kee-frame.auth.auth :refer [authenticate-fb]]
     [ring.util.http-response :refer :all]
     [clojure.java.io :as io]))
 
@@ -47,6 +48,13 @@
               :config {:validator-url nil}})}]]
    ["/ping"
     {:get (constantly (ok {:message "pong"}))}]
+
+   ["/authenticate_fb" {:post {:summary "authenticate with facebook"
+                               :parameters {:body {:accessToken string?
+                                                   :userID string?}}
+                               ;:responses {200 {:body map?}
+                               ;            500 {:errors map?}}
+                               :handler authenticate-fb}}]
 
    ["/posts"
     {:swagger {:tags ["posts"]}}

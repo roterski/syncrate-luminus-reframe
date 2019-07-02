@@ -1,7 +1,7 @@
 (ns syncrate-kee-frame.routes.home
   (:require
     [syncrate-kee-frame.layout :as layout]
-    [syncrate-kee-frame.db.core :as db]
+    [syncrate-kee-frame.config :refer [env]]
     [clojure.java.io :as io]
     [syncrate-kee-frame.middleware :as middleware]
     [ring.util.http-response :as response]))

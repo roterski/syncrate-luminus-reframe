@@ -1,8 +1,8 @@
--- :name create-user! :! :n
+-- :name create-user! :insert :raw
 -- :doc creates a new user record
 INSERT INTO users
-(id, first_name, last_name, email, pass)
-VALUES (:id, :first_name, :last_name, :email, :pass)
+(first_name, last_name, facebook_id, email)
+VALUES (:first_name, :last_name, :facebook_id, :email)
 
 -- :name update-user! :! :n
 -- :doc updates an existing user record
@@ -13,7 +13,7 @@ WHERE id = :id
 -- :name get-user :? :1
 -- :doc retrieves a user record given the id
 SELECT * FROM users
-WHERE id = :id
+WHERE facebook_id = :facebook_id
 
 -- :name delete-user! :! :n
 -- :doc deletes a user record given the id

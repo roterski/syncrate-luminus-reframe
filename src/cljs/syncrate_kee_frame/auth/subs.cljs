@@ -11,3 +11,8 @@
   :<- [:uid]
   (fn [uid _]
     (boolean uid)))
+
+(reg-sub
+  :fb-auth
+ (fn [db _]
+   (get-in db [:auth :fb-auth])))

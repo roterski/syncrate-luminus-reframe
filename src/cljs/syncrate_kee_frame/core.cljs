@@ -9,6 +9,7 @@
     [syncrate-kee-frame.db :refer [initial-db]]
     ;; -- auth --
     [syncrate-kee-frame.auth.subs]
+    [syncrate-kee-frame.auth.events]
     ;; -- posts --
     [syncrate-kee-frame.posts.subs]
     [syncrate-kee-frame.posts.events]
@@ -32,21 +33,21 @@
   (fn [db _]
     (:docs db)))
 
-(kf/reg-chain
-  ::load-home-page
-  (fn [_ _]
-    {:http-xhrio {:method          :get
-                  :uri             "/docs"
-                  :response-format (http/raw-response-format)
-                  :on-failure      [:common/set-error]}})
-  (fn [{:keys [db]} [_ docs]]
-    {:db (assoc db :docs docs)}))
+;(kf/reg-chain
+;  ::load-home-page
+;  (fn [_ _]
+;    {:http-xhrio {:method          :get
+;                  :uri             "/docs"
+;                  :response-format (http/raw-response-format)
+;                  :on-failure      [:common/set-error]}})
+;  (fn [{:keys [db]} [_ docs]]
+;    {:db (assoc db :docs docs)}))
 
 
 (kf/reg-controller
   ::home-controller
   {:params (constantly true)
-   :start  [::load-home-page]})
+   :start  (fn [])})
 
 ;; -------------------------
 ;; Initialize app
@@ -62,4 +63,5 @@
 
 (defn init! [debug?]
   (ajax/load-interceptors!)
+  ;(rf/dispatch [:check-fb-auth])
   (mount-components debug?))
