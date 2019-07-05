@@ -9,7 +9,8 @@
   (fn-traced [{:keys [db]} _]
     (do
       (js/window.FB.logout)
-      {:db (assoc-in db [:auth] nil)})))
+      {:db (assoc-in db [:auth] nil)
+       :navigate-to [:log-in]})))
 
 (reg-event-fx
   :fb-log-in
@@ -19,17 +20,10 @@
       {})))
 
 (reg-event-fx
-  :check-fb-auth
-  (fn-traced []
-    (do
-      (js/window.FB.getLoginStatus #(dispatch [:handle-fb-auth %]))
-      {})))
-
-(reg-event-fx
   :handle-fb-auth
   (fn-traced [{:keys [db]} [_ response]]
     (let [parsed-response (w/keywordize-keys (js->clj response))
-          next-event (if (= (:status parsed-response))
+          next-event (if (= (:status parsed-response) "connected")
                        [:authenticate-backend (get-in parsed-response [:authResponse :accessToken])]
                        [:authentication-failed parsed-response])]
       {:dispatch next-event})))
@@ -46,9 +40,14 @@
                     :on-success [:authentication-succeeded]
                     :on-failure [:authentication-failed]}})))
 
-
 (reg-event-db
   :authentication-succeeded
   (fn-traced [db [_ response]]
     (-> db
       (update-in [:auth] merge (w/keywordize-keys response)))))
+
+(reg-event-fx
+  :authentication-failed
+  (fn-traced [{:keys [db]} [_ response]]
+    {:db (assoc-in db [:errors :auth] response)
+     :dispatch [:log-out]}))

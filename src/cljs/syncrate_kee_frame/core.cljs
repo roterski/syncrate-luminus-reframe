@@ -63,5 +63,4 @@
 
 (defn init! [debug?]
   (ajax/load-interceptors!)
-  ;(rf/dispatch [:check-fb-auth])
   (mount-components debug?))
