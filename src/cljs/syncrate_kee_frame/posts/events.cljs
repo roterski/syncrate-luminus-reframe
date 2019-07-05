@@ -1,11 +1,12 @@
 (ns syncrate-kee-frame.posts.events
-  (:require [re-frame.core :refer [reg-event-db reg-event-fx]]
+  (:require [re-frame.core :refer [reg-event-db reg-event-fx subscribe]]
             [ajax.core :as http]
             [syncrate-kee-frame.db :refer [initial-db]]
             [syncrate-kee-frame.spec :refer [check-spec-interceptor]]
             [clojure.walk :as w]
             [kee-frame.core :as kf]
-            [day8.re-frame.tracing :refer-macros [fn-traced]]))
+            [day8.re-frame.tracing :refer-macros [fn-traced]]
+            [re-frame.core :as rf]))
 
 (def posts-interceptors [check-spec-interceptor])
 
@@ -18,6 +19,12 @@
                 [id (assoc v :id id)])))
        (into {})))
 
+(defn build-headers []
+  (let [token @(rf/subscribe [:auth-token])]
+    (merge {:Content-Type "application/json"}
+           (when token
+             {:Authorization (str "Token " token)}))))
+
 (reg-event-fx
   :load-posts
   posts-interceptors
@@ -25,6 +32,7 @@
     {:http-xhrio {:method          :get
                   :uri             "/api/posts"
                   :response-format (http/json-response-format)
+                  :headers         (build-headers)
                   :on-success      [:posts-loaded-successfully]
                   :on-failure      [:common/set-request-error]}}))
 
@@ -37,6 +45,7 @@
      :http-xhrio {:method :get
                   :uri (str "/api/posts/" post-id)
                   :response-format (http/json-response-format)
+                  :headers         (build-headers)
                   :on-success [:post-loaded]
                   :on-failure [:common/set-request-error]}}))
 
@@ -51,11 +60,11 @@
 (reg-event-fx
   :create-post
   posts-interceptors
-  (fn-traced [db [_ post]]
-    {:http-xhrio {:method :post
-                  :uri "/api/posts"
-                  :body (js/JSON.stringify (clj->js post))
-                  :headers {:content-type "application/json"}
+  (fn-traced [_ [_ post]]
+    {:http-xhrio {:method          :post
+                  :uri             "/api/posts"
+                  :body            (js/JSON.stringify (clj->js post))
+                  :headers         (build-headers)
                   :response-format (http/json-response-format)
                   :on-success      [:post-created]
                   :on-failure      [:common/set-error]}}))
@@ -63,14 +72,14 @@
 (reg-event-fx
   :post-created
   posts-interceptors
-  (fn-traced [db [_ response]]
+  (fn-traced [_ [_ response]]
     {:dispatch [:upsert-post response]
      :navigate-to [:posts]}))
 
 (reg-event-fx
   :post-loaded
   posts-interceptors
-  (fn-traced [db [_ response]]
+  (fn-traced [_ [_ response]]
     {:dispatch [:upsert-post response]}))
 
 (reg-event-db

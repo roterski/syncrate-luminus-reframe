@@ -1,6 +1,5 @@
 (ns syncrate-kee-frame.posts.controllers
-  (:require [kee-frame.core :as kf]
-            [ajax.core :as http]))
+  (:require [kee-frame.core :as kf]))
 
 (kf/reg-controller
   ::posts-controller

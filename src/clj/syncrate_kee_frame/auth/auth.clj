@@ -4,6 +4,8 @@
             [clj-http.client :as client]
             [cheshire.core :refer [parse-string]]
             [clojure.walk :refer [keywordize-keys]]
+            [buddy.sign.jwt :as jwt]
+            [syncrate-kee-frame.config :refer [env]]
             [ring.util.http-response :as response]))
 
 (defn fetch-fb-data
@@ -27,18 +29,20 @@
 
 (defn authenticate-fb [{:keys [body-params]}]
   (try
-   (let [fb-response (fetch-fb-data (:accessToken body-params))
+   (let [fb-response (fetch-fb-data (:fb-token body-params))
          user-data (parse-fb-data fb-response)
          user-found (-> user-data
                         (select-keys [:facebook_id])
                         (db/get-user))
-         user (if user-found
-                user-found
-                (-> user-data
-                  (db/create-user!)))]
+         user (or user-found
+                (db/create-user! user-data))
+         auth-token (-> user
+                        (select-keys [:id :facebook_id])
+                        (jwt/sign (:auth-secret env)))]
 
      {:status 200
-      :body user})
+      :body {:auth-token auth-token
+             :current-user (select-keys user [:id :first_name])}})
    (catch Exception e
      (let [{id :syncrate-kee-frame/error-id
             errors :errors} (ex-data e)]

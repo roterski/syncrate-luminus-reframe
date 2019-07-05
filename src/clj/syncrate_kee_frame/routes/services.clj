@@ -7,6 +7,7 @@
     [reitit.ring.middleware.muuntaja :as muuntaja]
     [reitit.ring.middleware.multipart :as multipart]
     [reitit.ring.middleware.parameters :as parameters]
+    [syncrate-kee-frame.middleware :refer [wrap-restricted]]
     [syncrate-kee-frame.middleware.formats :as formats]
     [syncrate-kee-frame.middleware.exception :as exception]
     [syncrate-kee-frame.posts.posts :refer [create-post index-posts show-post]]
@@ -50,14 +51,14 @@
     {:get (constantly (ok {:message "pong"}))}]
 
    ["/authenticate_fb" {:post {:summary "authenticate with facebook"
-                               :parameters {:body {:accessToken string?
-                                                   :userID string?}}
+                               :parameters {:body {:fb-token string?}}
                                ;:responses {200 {:body map?}
                                ;            500 {:errors map?}}
                                :handler authenticate-fb}}]
 
    ["/posts"
-    {:swagger {:tags ["posts"]}}
+    {:swagger {:tags ["posts"]}
+     :middleware [wrap-restricted]}
     [""
      {:get  {:summary    "return list of posts"
              :parameters {}

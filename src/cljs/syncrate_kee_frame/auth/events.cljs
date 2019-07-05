@@ -15,42 +15,29 @@
   :fb-log-in
   (fn-traced []
     (do
-      (js/window.FB.login #(dispatch [:set-fb-auth %]))
+      (js/window.FB.login #(dispatch [:handle-fb-auth %]))
       {})))
 
 (reg-event-fx
   :check-fb-auth
   (fn-traced []
     (do
-      (js/window.FB.getLoginStatus #(dispatch [:set-fb-auth %]))
+      (js/window.FB.getLoginStatus #(dispatch [:handle-fb-auth %]))
       {})))
 
 (reg-event-fx
-  :set-fb-auth
+  :handle-fb-auth
   (fn-traced [{:keys [db]} [_ response]]
     (let [parsed-response (w/keywordize-keys (js->clj response))
           next-event (if (= (:status parsed-response))
-                       [:authenticate-backend]
+                       [:authenticate-backend (get-in parsed-response [:authResponse :accessToken])]
                        [:authentication-failed parsed-response])]
-      {:db (assoc-in db [:auth :fb-auth] parsed-response)
-       :dispatch next-event})))
-
-;(reg-event-fx
-;  :set-fb-auth
-;  (fn-traced [{:keys [db]} [_ response]]
-;             (let [parsed-response (w/keywordize-keys (js->clj response))
-;                   db-update {:db (assoc-in db [:auth :fb-auth] parsed-response)}]
-;               (if (= (:status parsed-response) "connected")
-;                 (merge db-update {:dispatch [:authenticate-backend]})
-;                 db-update))))
-
+      {:dispatch next-event})))
 
 (reg-event-fx
   :authenticate-backend
-  (fn-traced [{:keys [db]} _]
-    (let [body (-> db
-                   (get-in [:auth :fb-auth :authResponse])
-                   (select-keys [:accessToken :userID]))]
+  (fn-traced [{:keys [db]} [_ fb-token]]
+    (let [body {:fb-token fb-token}]
       {:http-xhrio {:method :post
                     :uri    "/api/authenticate_fb"
                     :headers {:content-type "application/json"}
@@ -60,14 +47,8 @@
                     :on-failure [:authentication-failed]}})))
 
 
-;(reg-event-fx
-;  :create-post
-;  posts-interceptors
-;  (fn-traced [db [_ post]]
-;             {:http-xhrio {:method :post
-;                           :uri "/api/posts"
-;                           :body (js/JSON.stringify (clj->js post))
-;                           :headers {:content-type "application/json"}
-;                           :response-format (http/json-response-format)
-;                           :on-success      [:post-created]
-;                           :on-failure      [:common/set-error]}}))
+(reg-event-db
+  :authentication-succeeded
+  (fn-traced [db [_ response]]
+    (-> db
+      (update-in [:auth] merge (w/keywordize-keys response)))))

@@ -1,5 +1,5 @@
 (ns syncrate-kee-frame.errors.events
-  (:require [re-frame.core :refer [reg-event-db]]
+  (:require [re-frame.core :refer [reg-event-fx reg-event-db]]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
             [syncrate-kee-frame.spec :refer [check-spec-interceptor]]))
 
@@ -26,12 +26,12 @@
       (-> db
           (update-in [:errors] #(merge % {:error error}))))))
 
-
-(reg-event-db
+(reg-event-fx
   :common/set-request-error
   errors-interceptors
-  (fn-traced [db [_ error]]
+  (fn-traced [{:keys [db]} [_ error]]
     (do
       (js/console.error error)
-      (-> db
-          (update-in [:errors] #(merge % {:request error}))))))
+      (merge {:db (assoc-in db [:errors :request] error)}
+             (when (= (:status error) 403)
+              {:navigate-to [:log-in]})))))

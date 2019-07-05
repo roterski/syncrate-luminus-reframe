@@ -13,11 +13,11 @@
     [immutant.web.middleware :refer [wrap-session]]
     [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
     [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
-            [buddy.auth.accessrules :refer [restrict]]
-            [buddy.auth :refer [authenticated?]]
-    [buddy.auth.backends.session :refer [session-backend]])
-  (:import 
-           ))
+    [buddy.auth.accessrules :refer [restrict]]
+    [buddy.auth :refer [authenticated?]]
+    [buddy.auth.backends :as backends])
+  (:import))
+
 
 (defn wrap-internal-error [handler]
   (fn [req]
@@ -46,16 +46,16 @@
       ((if (:websocket? request) handler wrapped) request))))
 
 (defn on-error [request response]
-  (error-page
-    {:status 403
-     :title (str "Access to " (:uri request) " is not authorized")}))
+  {:status 403
+   :headers {}
+   :body (str "Access to " (:uri request) " is not authorized")})
 
 (defn wrap-restricted [handler]
   (restrict handler {:handler authenticated?
                      :on-error on-error}))
 
 (defn wrap-auth [handler]
-  (let [backend (session-backend)]
+  (let [backend (backends/jws {:secret (:auth-secret env)})]
     (-> handler
         (wrap-authentication backend)
         (wrap-authorization backend))))
@@ -63,8 +63,8 @@
 (defn wrap-base [handler]
   (-> ((:middleware defaults) handler)
       wrap-auth
-      wrap-flash
-      (wrap-session {:cookie-attrs {:http-only true}})
+      ;wrap-flash
+      ;(wrap-session {:cookie-attrs {:http-only true}})
       (wrap-defaults
         (-> site-defaults
             (assoc-in [:security :anti-forgery] false)

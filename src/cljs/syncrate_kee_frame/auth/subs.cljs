@@ -2,17 +2,17 @@
   (:require [re-frame.core :refer [reg-sub]]))
 
 (reg-sub
-  :uid
+  :current-user
   (fn [db _]
-    (get-in db [:auth :uid])))
+    (get-in db [:auth :current-user])))
 
 (reg-sub
   :logged-in?
-  :<- [:uid]
-  (fn [uid _]
-    (boolean uid)))
+  :<- [:current-user]
+  (fn [current-user _]
+    (boolean current-user)))
 
 (reg-sub
-  :fb-auth
+  :auth-token
  (fn [db _]
-   (get-in db [:auth :fb-auth])))
+   (get-in db [:auth :auth-token])))
