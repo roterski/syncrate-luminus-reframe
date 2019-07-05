@@ -22,8 +22,7 @@
     (ring/ring-handler
       (ring/router
         [(home-routes)
-         (service-routes)
-         (oauth-routes)])
+         (service-routes)])
       (ring/routes
         (swagger-ui/create-swagger-ui-handler
           {:path   "/swagger-ui"
