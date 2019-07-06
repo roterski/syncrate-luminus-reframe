@@ -41,8 +41,7 @@
                         (jwt/sign (:auth-secret env)))]
 
      {:status 200
-      :body {:auth-token auth-token
-             :current-user (select-keys user [:id :first_name])}})
+      :body {:auth-token auth-token}})
    (catch Exception e
      (let [{id :syncrate-kee-frame/error-id
             errors :errors} (ex-data e)]

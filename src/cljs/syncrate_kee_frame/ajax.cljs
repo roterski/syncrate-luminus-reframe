@@ -8,11 +8,19 @@
 (defn local-uri? [{:keys [uri]}]
   (not (re-find #"^\w+?://" uri)))
 
+(defn build-headers []
+  (let [token @(rf/subscribe [:auth-token])]
+    (merge {:Content-Type "application/json"}
+      (when token
+        {:Authorization (str "Token " token)
+         "x-csrf-token" js/csrfToken}))))
+
 (defn default-headers [request]
   (if (local-uri? request)
     (-> request
-        (update :headers #(merge {"x-csrf-token" js/csrfToken} %)))
+        (update :headers #(merge (build-headers) %)))
     request))
+
 
 ;; injects transit serialization config into request options
 (defn as-transit [opts]

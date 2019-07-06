@@ -44,7 +44,6 @@
     (let [body {:fb-token fb-token}]
       {:http-xhrio {:method :post
                     :uri    "/api/authenticate_fb"
-                    :headers {:content-type "application/json"}
                     :response-format (http/json-response-format)
                     :body (js/JSON.stringify (clj->js body))
                     :on-success [:authentication-succeeded]

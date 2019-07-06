@@ -19,12 +19,6 @@
                 [id (assoc v :id id)])))
        (into {})))
 
-(defn build-headers []
-  (let [token @(rf/subscribe [:auth-token])]
-    (merge {:Content-Type "application/json"}
-           (when token
-             {:Authorization (str "Token " token)}))))
-
 (reg-event-fx
   :load-posts
   posts-interceptors
@@ -32,7 +26,6 @@
     {:http-xhrio {:method          :get
                   :uri             "/api/posts"
                   :response-format (http/json-response-format)
-                  :headers         (build-headers)
                   :on-success      [:posts-loaded-successfully]
                   :on-failure      [:common/set-request-error]}}))
 
@@ -45,7 +38,6 @@
      :http-xhrio {:method :get
                   :uri (str "/api/posts/" post-id)
                   :response-format (http/json-response-format)
-                  :headers         (build-headers)
                   :on-success [:post-loaded]
                   :on-failure [:common/set-request-error]}}))
 
@@ -64,7 +56,6 @@
     {:http-xhrio {:method          :post
                   :uri             "/api/posts"
                   :body            (js/JSON.stringify (clj->js post))
-                  :headers         (build-headers)
                   :response-format (http/json-response-format)
                   :on-success      [:post-created]
                   :on-failure      [:common/set-error]}}))
