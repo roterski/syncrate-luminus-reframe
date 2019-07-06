@@ -48,7 +48,7 @@
 (defn on-error [request response]
   {:status 403
    :headers {}
-   :body (str "Access to " (:uri request) " is not authorized")})
+   :body {:errors {:access (str "Access to " (:uri request) " is not authorized")}}})
 
 (defn wrap-restricted [handler]
   (restrict handler {:handler authenticated?
