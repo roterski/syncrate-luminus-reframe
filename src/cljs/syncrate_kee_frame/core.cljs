@@ -7,6 +7,7 @@
     [syncrate-kee-frame.routing :as routing]
     [syncrate-kee-frame.view :as view]
     [syncrate-kee-frame.db :refer [initial-db]]
+    [syncrate-kee-frame.effects]
     ;; -- auth --
     [syncrate-kee-frame.auth.subs]
     [syncrate-kee-frame.auth.events]
@@ -63,4 +64,5 @@
 
 (defn init! [debug?]
   (ajax/load-interceptors!)
+  (rf/dispatch [:restore-auth])
   (mount-components debug?))
