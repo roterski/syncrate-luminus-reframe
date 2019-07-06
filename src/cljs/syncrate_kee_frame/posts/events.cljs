@@ -1,10 +1,14 @@
 (ns syncrate-kee-frame.posts.events
-  (:require [re-frame.core :refer [reg-event-db reg-event-fx]]
+  (:require [re-frame.core :refer [reg-event-db reg-event-fx subscribe]]
             [ajax.core :as http]
             [syncrate-kee-frame.db :refer [initial-db]]
+            [syncrate-kee-frame.spec :refer [check-spec-interceptor]]
             [clojure.walk :as w]
             [kee-frame.core :as kf]
-            [day8.re-frame.tracing :refer-macros [fn-traced]]))
+            [day8.re-frame.tracing :refer-macros [fn-traced]]
+            [re-frame.core :as rf]))
+
+(def posts-interceptors [check-spec-interceptor])
 
 (defn keywordize-id
   [coll]
@@ -17,6 +21,7 @@
 
 (reg-event-fx
   :load-posts
+  posts-interceptors
   (fn-traced [_ _]
     {:http-xhrio {:method          :get
                   :uri             "/api/posts"
@@ -26,46 +31,51 @@
 
 (reg-event-fx
   :load-post
+  posts-interceptors
   (fn-traced [{:keys [db]} [_ [post-id]]]
     {
      :db (assoc db :active-post (keyword post-id))
      :http-xhrio {:method :get
-                  :uri (str "/api/post/" post-id)
+                  :uri (str "/api/posts/" post-id)
                   :response-format (http/json-response-format)
                   :on-success [:post-loaded]
                   :on-failure [:common/set-request-error]}}))
 
 (reg-event-db
   :posts-loaded-successfully
-  (fn-traced [db [_ posts]]
+  posts-interceptors
+  (fn-traced [db [_ response]]
     (-> db
       (assoc-in [:loading :posts] false)
-      (assoc-in [:posts] (keywordize-id posts)))))
+      (assoc-in [:posts] (keywordize-id (get response "data"))))))
 
 (reg-event-fx
   :create-post
-  (fn-traced [db [_ post]]
-    {:http-xhrio {:method :post
-                  :uri "/api/posts"
-                  :body (js/JSON.stringify (clj->js post))
-                  :headers {:content-type "application/json"}
+  posts-interceptors
+  (fn-traced [_ [_ post]]
+    {:http-xhrio {:method          :post
+                  :uri             "/api/posts"
+                  :body            (js/JSON.stringify (clj->js post))
                   :response-format (http/json-response-format)
                   :on-success      [:post-created]
                   :on-failure      [:common/set-error]}}))
 
 (reg-event-fx
   :post-created
-  (fn-traced [db [_ response]]
+  posts-interceptors
+  (fn-traced [_ [_ response]]
     {:dispatch [:upsert-post response]
      :navigate-to [:posts]}))
 
 (reg-event-fx
   :post-loaded
-  (fn-traced [db [_ response]]
+  posts-interceptors
+  (fn-traced [_ [_ response]]
     {:dispatch [:upsert-post response]}))
 
 (reg-event-db
   :upsert-post
+  posts-interceptors
   (fn-traced [db [_ post]]
     (let [post (w/keywordize-keys post)
           post-id (keyword (str (or (:id post) (random-uuid))))

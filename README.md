@@ -12,9 +12,21 @@ You will need [Leiningen][1] 2.0 or above installed.
 
 ## Running
 
-To start a web server for the application, run:
+server:
 
     lein run 
+    
+client:
+    
+    lein shadow watch app
+
+## Swagger UI
+
+http://localhost:3000/swagger-ui
+
+## Configuration
+
+Change <SECRET_VARIABLES> in `dev-config.sample.end` and remove `.sample.` infix from its file name.
 
 ## License
 

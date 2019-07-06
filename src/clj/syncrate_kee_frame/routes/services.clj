@@ -9,9 +9,9 @@
     [reitit.ring.middleware.parameters :as parameters]
     [syncrate-kee-frame.middleware.formats :as formats]
     [syncrate-kee-frame.middleware.exception :as exception]
-    [syncrate-kee-frame.posts.posts :refer [create-post index-posts show-post]]
-    [ring.util.http-response :refer :all]
-    [clojure.java.io :as io]))
+    [syncrate-kee-frame.posts.routes :refer [posts-routes]]
+    [syncrate-kee-frame.auth.routes :refer [auth-routes]]
+    [ring.util.http-response :refer :all]))
 
 (defn service-routes []
   ["/api"
@@ -39,59 +39,12 @@
    ["" {:no-doc true
         :swagger {:info {:title "my-api"
                          :description "https://cljdoc.org/d/metosin/reitit"}}}
-
     ["/swagger.json"
      {:get (swagger/create-swagger-handler)}]
-    ["/posts"
-     {:get index-posts
-      :post create-post}]
-    ["/post/:id"
-     {:get show-post}]
-
     ["/api-docs/*"
      {:get (swagger-ui/create-swagger-ui-handler
              {:url "/api/swagger.json"
               :config {:validator-url nil}})}]]
+   (auth-routes)
+   (posts-routes)])
 
-   ["/ping"
-    {:get (constantly (ok {:message "pong"}))}]
-   
-
-   ["/math"
-    {:swagger {:tags ["math"]}}
-
-    ["/plus"
-     {:get {:summary "plus with spec query parameters"
-            :parameters {:query {:x int?, :y int?}}
-            :responses {200 {:body {:total pos-int?}}}
-            :handler (fn [{{{:keys [x y]} :query} :parameters}]
-                       {:status 200
-                        :body {:total (+ x y)}})}
-      :post {:summary "plus with spec body parameters"
-             :parameters {:body {:x int?, :y int?}}
-             :responses {200 {:body {:total pos-int?}}}
-             :handler (fn [{{{:keys [x y]} :body} :parameters}]
-                        {:status 200
-                         :body {:total (+ x y)}})}}]]
-
-   ["/files"
-    {:swagger {:tags ["files"]}}
-
-    ["/upload"
-     {:post {:summary "upload a file"
-             :parameters {:multipart {:file multipart/temp-file-part}}
-             :responses {200 {:body {:name string?, :size int?}}}
-             :handler (fn [{{{:keys [file]} :multipart} :parameters}]
-                        {:status 200
-                         :body {:name (:filename file)
-                                :size (:size file)}})}}]
-
-    ["/download"
-     {:get {:summary "downloads a file"
-            :swagger {:produces ["image/png"]}
-            :handler (fn [_]
-                       {:status 200
-                        :headers {"Content-Type" "image/png"}
-                        :body (-> "public/img/warning_clojure.png"
-                                  (io/resource)
-                                  (io/input-stream))})}}]]])

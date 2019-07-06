@@ -2,26 +2,13 @@
   (:require
     [re-frame.core :as rf]))
 
-;(def routes
-;  [["/" :home]
-;   ["/about/" :about]
-;   ["/posts/" ["" :posts
-;               "new" :new-post
-;               [:post-id] :post]]])
-
-;(def routes
-;  [["/" :home]
-;   ["/about" :about]
-;   ["/posts" ["/" :posts
-;              "/new" :new-post
-;              "/:post-id" :post]]])
-
 (def routes
   [["/" :home]
    ["/about" :about]
    ["/posts" :posts]
    ["/posts/:post-id" :post]
-   ["/new-post" :new-post]])
+   ["/new-post" :new-post]
+   ["/log-in" :log-in]])
 
 (rf/reg-sub
   :nav/route

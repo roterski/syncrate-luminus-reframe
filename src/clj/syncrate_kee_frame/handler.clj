@@ -4,7 +4,6 @@
     [syncrate-kee-frame.layout :refer [error-page]]
     [syncrate-kee-frame.routes.home :refer [home-routes home-page]]
     [syncrate-kee-frame.routes.services :refer [service-routes]]
-    [syncrate-kee-frame.routes.oauth :refer [oauth-routes]]
     [reitit.swagger-ui :as swagger-ui]
     [reitit.ring :as ring]
     [ring.middleware.content-type :refer [wrap-content-type]]
@@ -22,8 +21,7 @@
     (ring/ring-handler
       (ring/router
         [(home-routes)
-         (service-routes)
-         (oauth-routes)])
+         (service-routes)])
       (ring/routes
         (swagger-ui/create-swagger-ui-handler
           {:path   "/swagger-ui"
