@@ -2,6 +2,7 @@
   (:require
             [syncrate-kee-frame.components.page-nav :refer [page-nav]]
             [syncrate-kee-frame.components.form-group :refer [form-group]]
+            [syncrate-kee-frame.validation :refer [validate post-schema]]
             [reagent.core :as r]
             [re-frame.core :as rf]
             [clojure.string :as str]
@@ -11,13 +12,14 @@
 (defn new-post
   []
   (let [initial-values {:title "" :body ""}
+        form-key :POST_api_posts
         values (r/atom initial-values)
-        save (fn [event {:keys [title body]}]
+        save (fn [event vals]
                (.preventDefault event)
-               (when (and (not (str/blank? title))
-                          (not (str/blank? body)))
-                 (rf/dispatch [:create-post @values]
-                   (reset! values initial-values))))]
+               (let [[errors data] (validate vals post-schema)]
+                 (if errors
+                   (rf/dispatch [:common/set-validation-errors errors form-key])
+                   (rf/dispatch [:create-post @values]))))]
     (fn []
       [:> Box
        [page-nav {:left :posts
@@ -28,11 +30,13 @@
           [:form
            [:> Row
             [form-group {:id :title
+                         :form-key form-key
                          :label "Title"
                          :type "text"
                          :values values}]]
            [:> Row
             [form-group {:id :body
+                         :form-key form-key
                          :label "Body"
                          :type "textarea"
                          :element Textarea

@@ -1,15 +1,14 @@
 (ns syncrate-kee-frame.posts.posts
   (:require [syncrate-kee-frame.db.core :as db]
             [clojure.pprint :refer [pprint]]
-            [struct.core :as st]
             [syncrate-kee-frame.middleware.exception :refer [handle-exception]]
-            [syncrate-kee-frame.validation :refer [post-schema]]))
+            [syncrate-kee-frame.validation :refer [validate! post-schema]]))
 
 
 (defn create-post [{:keys [body-params]}]
   (try
     (let [created-post (-> body-params
-                           (st/validate! post-schema)
+                           (validate! post-schema)
                            (db/create-post!))]
       {:status 200
        :body created-post})

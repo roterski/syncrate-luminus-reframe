@@ -125,6 +125,7 @@
                                  [day8.re-frame/re-frame-10x "0.4.0"]
                                  [day8.re-frame/tracing "0.5.1"]
                                  [re-frame "0.10.5"]
+                                 [bouncer "1.0.1"]
                                  [ring/ring-devel "1.7.1"]
                                  [ring/ring-mock "0.4.0"]]
                   :plugins      [[com.jakemccrary/lein-test-refresh "0.24.1"]]

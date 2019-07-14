@@ -17,34 +17,34 @@
       [:textarea (apply dissoc props skip)])))
 
 (defn form-group
-  [{:keys [id label type values element on-key-down] :or {element Input}}]
-  (let [errors @(rf/subscribe [:errors])
-        input-error (get errors id)
+  [{:keys [id form-key label type values element on-key-down] :or {element Input}}]
+  (let [
+        ;errors {}
+        errors @(rf/subscribe [:form-errors form-key])
+        input-error (when-let [errs (get errors id)]
+                      (clojure.string/join ", " errs))
         is-empty? (str/blank? (id @values))
         textarea (= element Textarea)
-        input (= element Input)
-        valid (if input-error
-                false
-                nil)
-        validate (fn []
-                   (if is-empty?
-                     (rf/dispatch [:has-value? id])
-                     (rf/dispatch [:clear-error id])))]
+        input (= element Input)]
+        ;validate (fn []
+        ;           (if is-empty?
+        ;             (rf/dispatch [:has-value? id])
+        ;             (rf/dispatch [:clear-error id])))]
     [:> FormGroup
      [:> Label {:html-for id} label]
      [:> element {:as (cond
                         input r-input
                         textarea r-textarea)
                   :control true
-                  :valid valid
-                  :on-blur validate
+                  :valid (not input-error)
+                  ;:on-blur validate
                   :rows (when textarea 6)
                   :id id
                   :type type
                   :value (id @values)
                   :on-change #(swap! values assoc id (.. % -target -value))
-                  :on-key-down on-key-down
-                  :on-key-up (when-not (str/blank? (id @values)) validate)}]
+                  :on-key-down on-key-down}]
+                  ;:on-key-up (when-not (str/blank? (id @values)) validate)}]
      (when input-error
        [:> ControlFeedback {:valid false}
         input-error])]))

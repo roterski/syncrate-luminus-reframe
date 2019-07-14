@@ -5,3 +5,9 @@
   :errors
   (fn [db _]
     (:errors db)))
+
+(reg-sub
+  :form-errors
+  :<- [:errors]
+  (fn [errors [_ form-key]]
+    (get-in errors [:validations form-key])))

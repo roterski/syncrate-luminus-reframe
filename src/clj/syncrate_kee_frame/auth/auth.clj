@@ -6,6 +6,7 @@
             [clojure.walk :refer [keywordize-keys]]
             [buddy.sign.jwt :as jwt]
             [syncrate-kee-frame.config :refer [env]]
+            [syncrate-kee-frame.validation :refer [validate! user-schema]]
             [syncrate-kee-frame.middleware.exception :refer [handle-exception]]
             [ring.util.http-response :as response]))
 
@@ -39,7 +40,7 @@
                        (select-keys [:facebook_id])
                        (db/get-user))]
     (or user-found
-        (db/create-user! user-data))))
+        (db/create-user! (validate! user-data user-schema)))))
 
 (defn authenticate-fb [{:keys [body-params]}]
   (try

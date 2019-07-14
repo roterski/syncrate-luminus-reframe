@@ -58,7 +58,7 @@
                   :body            (js/JSON.stringify (clj->js post))
                   :response-format (http/json-response-format)
                   :on-success      [:post-created]
-                  :on-failure      [:common/set-error]}}))
+                  :on-failure      [:common/handle-server-validation-error]}}))
 
 (reg-event-fx
   :post-created
