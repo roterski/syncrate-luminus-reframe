@@ -3,7 +3,7 @@
             [ajax.core :as http]
             [syncrate-kee-frame.db :refer [initial-db]]
             [syncrate-kee-frame.spec :refer [check-spec-interceptor]]
-            [syncrate-kee-frame.errors.events :refer [build-form-key]]
+            [syncrate-kee-frame.utils :refer [build-form-key]]
             [clojure.walk :as w]
             [kee-frame.core :as kf]
             [day8.re-frame.tracing :refer-macros [fn-traced]]

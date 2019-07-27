@@ -12,7 +12,7 @@
 (defn new-post
   []
   (let [form-key :POST_api_posts
-        values (rf/subscribe [:form-values form-key])
+        values (rf/subscribe [:forms/values form-key])
         save (fn [event vals]
                (.preventDefault event)
                (let [[errors data] (validate vals post-schema)]
@@ -32,6 +32,7 @@
                          :form-key form-key
                          :label "Title"
                          :type "text"
+                         :schema post-schema
                          :initial-value ""
                          :values values}]]
            [:> Row
@@ -39,6 +40,7 @@
                          :form-key form-key
                          :label "Body"
                          :type "textarea"
+                         :schema post-schema
                          :initial-value ""
                          :element Textarea
                          :values values}]]

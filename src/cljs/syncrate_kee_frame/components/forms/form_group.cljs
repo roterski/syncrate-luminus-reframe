@@ -1,6 +1,7 @@
 (ns syncrate-kee-frame.components.forms.form-group
   (:require [reagent.core :as r]
             [re-frame.core :as rf]
+            [syncrate-kee-frame.validation :refer [validate-field]]
             [clojure.string :as str]
             ["@smooth-ui/core-sc" :refer [FormGroup Label Input Textarea ControlFeedback]]))
 
@@ -17,17 +18,18 @@
       [:textarea (apply dissoc props skip)])))
 
 (defn form-group
-  [{:keys [id form-key label type values element on-key-down] :or {element Input}}]
+  [{:keys [id form-key label type schema values element on-key-down] :or {element Input}}]
   (let [errors @(rf/subscribe [:forms/errors form-key])
         input-error (when-let [errs (get errors id)]
                       (clojure.string/join ", " errs))
-        is-empty? (str/blank? (id @values))
         textarea (= element Textarea)
-        input (= element Input)]
-        ;validate (fn []
-        ;           (if is-empty?
-        ;             (rf/dispatch [:has-value? id])
-        ;             (rf/dispatch [:clear-error id])))]
+        input (= element Input)
+        value (id @values)
+        validate (fn []
+                   (let [errors (first (validate-field value id schema))]
+                     (if errors
+                       (rf/dispatch [:errors/set-validation-errors errors form-key])
+                       (rf/dispatch [:errors/set-validation-errors {id nil} form-key]))))]
     [:> FormGroup
      [:> Label {:html-for id} label]
      [:> element {:as (cond
@@ -35,11 +37,11 @@
                         textarea r-textarea)
                   :control true
                   :valid (not input-error)
-                  ;:on-blur validate
+                  :on-blur validate
                   :rows (when textarea 6)
                   :id id
                   :type type
-                  :value (id @values)
+                  :value value
                   :on-change (fn [ev]
                                (let [val (.. ev -target -value)]
                                  (rf/dispatch [:forms/set-form-values form-key {id val}])))
