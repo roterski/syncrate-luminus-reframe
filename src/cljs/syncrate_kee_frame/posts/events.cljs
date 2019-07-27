@@ -3,6 +3,7 @@
             [ajax.core :as http]
             [syncrate-kee-frame.db :refer [initial-db]]
             [syncrate-kee-frame.spec :refer [check-spec-interceptor]]
+            [syncrate-kee-frame.errors.events :refer [build-form-key]]
             [clojure.walk :as w]
             [kee-frame.core :as kf]
             [day8.re-frame.tracing :refer-macros [fn-traced]]
@@ -60,12 +61,23 @@
                   :on-success      [:post-created]
                   :on-failure      [:common/handle-server-validation-error]}}))
 
+(defn response->data
+  [response]
+  (let [post (w/keywordize-keys response)
+        post-id (keyword (str (or (:id post) (random-uuid))))
+        post-data (assoc post :id post-id)]
+    post-data))
+
 (reg-event-fx
   :post-created
   posts-interceptors
-  (fn-traced [_ [_ response]]
-    {:dispatch [:upsert-post response]
-     :navigate-to [:posts]}))
+  (fn-traced [{:keys [db]} [_ response]]
+    (let [post-data (response->data response)
+          post-id (:id post-data)]
+      {:dispatch [:clear-form :POST_api_posts]
+       :db (-> db
+               (update-in [:posts post-id] merge post-data))
+       :navigate-to [:posts]})))
 
 (reg-event-fx
   :post-loaded
@@ -76,9 +88,8 @@
 (reg-event-db
   :upsert-post
   posts-interceptors
-  (fn-traced [db [_ post]]
-    (let [post (w/keywordize-keys post)
-          post-id (keyword (str (or (:id post) (random-uuid))))
-          post-data (assoc post :id post-id)]
+  (fn-traced [db [_ response]]
+    (let [post-data (response->data response)
+          post-id (:id post-data)]
       (-> db
           (update-in [:posts post-id] merge post-data)))))

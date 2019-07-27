@@ -13,7 +13,8 @@
   []
   (let [initial-values {:title "" :body ""}
         form-key :POST_api_posts
-        values (r/atom initial-values)
+        ;values (r/atom initial-values)
+        values (rf/subscribe [:form-values form-key])
         save (fn [event vals]
                (.preventDefault event)
                (let [[errors data] (validate vals post-schema)]
@@ -33,12 +34,14 @@
                          :form-key form-key
                          :label "Title"
                          :type "text"
+                         :initial-value ""
                          :values values}]]
            [:> Row
             [form-group {:id :body
                          :form-key form-key
                          :label "Body"
                          :type "textarea"
+                         :initial-value ""
                          :element Textarea
                          :values values}]]
            [:> Row

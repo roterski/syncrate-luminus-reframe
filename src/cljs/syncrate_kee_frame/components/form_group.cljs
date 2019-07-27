@@ -18,9 +18,7 @@
 
 (defn form-group
   [{:keys [id form-key label type values element on-key-down] :or {element Input}}]
-  (let [
-        ;errors {}
-        errors @(rf/subscribe [:form-errors form-key])
+  (let [errors @(rf/subscribe [:form-errors form-key])
         input-error (when-let [errs (get errors id)]
                       (clojure.string/join ", " errs))
         is-empty? (str/blank? (id @values))
@@ -42,7 +40,9 @@
                   :id id
                   :type type
                   :value (id @values)
-                  :on-change #(swap! values assoc id (.. % -target -value))
+                  :on-change (fn [ev]
+                               (let [val (.. ev -target -value)]
+                                 (rf/dispatch [:set-form-values form-key {id val}])))
                   :on-key-down on-key-down}]
                   ;:on-key-up (when-not (str/blank? (id @values)) validate)}]
      (when input-error

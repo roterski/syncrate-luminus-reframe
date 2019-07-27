@@ -8,6 +8,15 @@
 
 (reg-sub
   :form-errors
-  :<- [:errors]
-  (fn [errors [_ form-key]]
-    (get-in errors [:validations form-key])))
+  (fn [db [_ form-key]]
+    (get-in db [:forms form-key :errors])))
+
+(reg-sub
+  :form-values
+  (fn [db [_ form-key]]
+    (get-in db [:forms form-key :values])))
+
+(reg-sub
+  :db
+  (fn [db [_]]
+    db))

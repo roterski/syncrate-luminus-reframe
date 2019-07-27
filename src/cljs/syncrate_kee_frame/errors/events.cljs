@@ -51,7 +51,17 @@
   :common/set-validation-errors
   (fn-traced [db [_ errors form-key]]
     (-> db
-        (update-in [:errors :validations form-key] #(merge % errors)))))
+        (update-in [:forms form-key :errors] #(merge % errors)))))
+
+(reg-event-db
+  :set-form-values
+  (fn-traced [db [_ form-key values]]
+    (update-in db [:forms form-key :values] #(merge % values))))
+
+(reg-event-db
+  :clear-form
+  (fn-traced [db [_ form-key]]
+    (assoc-in db [:forms form-key] {})))
 
 (reg-event-fx
   :common/set-request-error
