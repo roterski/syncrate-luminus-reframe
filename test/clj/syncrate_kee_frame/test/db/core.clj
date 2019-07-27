@@ -19,19 +19,21 @@
 (deftest test-users
   (jdbc/with-db-transaction [t-conn *db*]
     (jdbc/db-set-rollback-only! t-conn)
-    (is (= 1 (db/create-user!
-               t-conn
-               {:id         "1"
-                :first_name "Sam"
-                :last_name  "Smith"
-                :email      "sam.smith@example.com"
-                :pass       "pass"})))
-    (is (= {:id         "1"
-            :first_name "Sam"
+    (is (= {:first_name "Sam"
             :last_name  "Smith"
+            :facebook_id "1234"
             :email      "sam.smith@example.com"
-            :pass       "pass"
-            :admin      nil
-            :last_login nil
-            :is_active  nil}
-           (db/get-user t-conn {:id "1"})))))
+            :admin      false}
+           (dissoc (db/create-user!
+                     t-conn
+                     {:first_name "Sam"
+                      :last_name  "Smith"
+                      :facebook_id "1234"
+                      :email      "sam.smith@example.com"})
+             :id :last_login :created_at)))
+    (is (= {:first_name "Sam"
+            :last_name  "Smith"
+            :facebook_id "1234"
+            :email      "sam.smith@example.com"
+            :admin      false}
+           (dissoc (db/get-user t-conn {:facebook_id "1234"}) :id :last_login :created_at)))))

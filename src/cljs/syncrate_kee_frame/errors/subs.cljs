@@ -5,3 +5,8 @@
   :errors
   (fn [db _]
     (:errors db)))
+
+(reg-sub
+  :db
+  (fn [db [_]]
+    db))

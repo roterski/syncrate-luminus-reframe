@@ -17,7 +17,10 @@
     [syncrate-kee-frame.posts.controllers]
     ;; -- errors --
     [syncrate-kee-frame.errors.subs]
-    [syncrate-kee-frame.errors.events]))
+    [syncrate-kee-frame.errors.events]
+    ;; -- forms --
+    [syncrate-kee-frame.components.forms.subs]
+    [syncrate-kee-frame.components.forms.events]))
 
 
 (rf/reg-event-fx

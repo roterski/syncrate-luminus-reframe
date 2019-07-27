@@ -1,7 +1,8 @@
 (ns syncrate-kee-frame.posts.views.new-post
   (:require
             [syncrate-kee-frame.components.page-nav :refer [page-nav]]
-            [syncrate-kee-frame.components.form-group :refer [form-group]]
+            [syncrate-kee-frame.components.forms.form-group :refer [form-group]]
+            [syncrate-kee-frame.validation :refer [validate post-schema]]
             [reagent.core :as r]
             [re-frame.core :as rf]
             [clojure.string :as str]
@@ -10,14 +11,14 @@
 
 (defn new-post
   []
-  (let [initial-values {:title "" :body ""}
-        values (r/atom initial-values)
-        save (fn [event {:keys [title body]}]
+  (let [form-key :POST_api_posts
+        values (rf/subscribe [:forms/values form-key])
+        save (fn [event vals]
                (.preventDefault event)
-               (when (and (not (str/blank? title))
-                          (not (str/blank? body)))
-                 (rf/dispatch [:create-post @values]
-                   (reset! values initial-values))))]
+               (let [[errors data] (validate vals post-schema)]
+                 (if errors
+                   (rf/dispatch [:errors/set-validation-errors errors form-key])
+                   (rf/dispatch [:create-post @values]))))]
     (fn []
       [:> Box
        [page-nav {:left :posts
@@ -28,13 +29,19 @@
           [:form
            [:> Row
             [form-group {:id :title
+                         :form-key form-key
                          :label "Title"
                          :type "text"
+                         :schema post-schema
+                         :initial-value ""
                          :values values}]]
            [:> Row
             [form-group {:id :body
+                         :form-key form-key
                          :label "Body"
                          :type "textarea"
+                         :schema post-schema
+                         :initial-value ""
                          :element Textarea
                          :values values}]]
            [:> Row

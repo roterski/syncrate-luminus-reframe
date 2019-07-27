@@ -1,0 +1,9 @@
+;; WARNING
+;; This a sample file for test-config.edn
+;; To make it work you need to replace secret variables (<SECRET>)
+;; and remove .sample. infix from the file name.
+
+{:port         3000
+ :database-url "postgresql://localhost/<DB_NAME>?user=<DB_USER>&password=<DB_PASSWORD>"
+ :fb-app-id     "<FB_APP_ID>"
+ :auth-secret  "secret"}

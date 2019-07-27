@@ -1,22 +1,19 @@
 (ns syncrate-kee-frame.posts.posts
   (:require [syncrate-kee-frame.db.core :as db]
             [clojure.pprint :refer [pprint]]
-            [ring.util.http-response :as response]))
+            [syncrate-kee-frame.middleware.exception :refer [handle-exception]]
+            [syncrate-kee-frame.validation :refer [validate! post-schema]]))
+
 
 (defn create-post [{:keys [body-params]}]
   (try
-    (let [created-post (db/create-post! body-params)]
+    (let [created-post (-> body-params
+                           (validate! post-schema)
+                           (db/create-post!))]
       {:status 200
        :body created-post})
     (catch Exception e
-      (let [{id :syncrate-kee-frame/error-id
-             errors :errors} (ex-data e)]
-        (case id
-          :validation
-          (response/bad-request {:errors errors})
-          ;;else
-          (response/internal-server-error
-            {:errors {:server-error ["Failed to create post!"]}}))))))
+      (handle-exception e "create post"))))
 
 (defn index-posts [_]
   (let [posts (db/get-posts)]
