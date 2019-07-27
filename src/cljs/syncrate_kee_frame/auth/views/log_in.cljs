@@ -3,7 +3,7 @@
             [re-frame.core :as rf]
             [kee-frame.core :as kf]
             [syncrate-kee-frame.components.page-nav :refer [page-nav]]
-            [syncrate-kee-frame.components.form-group :refer [form-group]]
+            [syncrate-kee-frame.components.forms.form-group :refer [form-group]]
             ["@smooth-ui/core-sc" :refer [Row Col FormGroup Label Input Box Button]]))
 
 (defn log-in

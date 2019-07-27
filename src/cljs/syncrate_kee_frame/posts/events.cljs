@@ -20,6 +20,13 @@
                 [id (assoc v :id id)])))
        (into {})))
 
+(defn response->data
+  [response]
+  (let [post (w/keywordize-keys response)
+        post-id (keyword (str (or (:id post) (random-uuid))))
+        post-data (assoc post :id post-id)]
+    post-data))
+
 (reg-event-fx
   :load-posts
   posts-interceptors
@@ -28,7 +35,7 @@
                   :uri             "/api/posts"
                   :response-format (http/json-response-format)
                   :on-success      [:posts-loaded-successfully]
-                  :on-failure      [:common/set-request-error]}}))
+                  :on-failure      [:errors/set-request-error]}}))
 
 (reg-event-fx
   :load-post
@@ -40,7 +47,7 @@
                   :uri (str "/api/posts/" post-id)
                   :response-format (http/json-response-format)
                   :on-success [:post-loaded]
-                  :on-failure [:common/set-request-error]}}))
+                  :on-failure [:errors/set-request-error]}}))
 
 (reg-event-db
   :posts-loaded-successfully
@@ -59,14 +66,7 @@
                   :body            (js/JSON.stringify (clj->js post))
                   :response-format (http/json-response-format)
                   :on-success      [:post-created]
-                  :on-failure      [:common/handle-server-validation-error]}}))
-
-(defn response->data
-  [response]
-  (let [post (w/keywordize-keys response)
-        post-id (keyword (str (or (:id post) (random-uuid))))
-        post-data (assoc post :id post-id)]
-    post-data))
+                  :on-failure      [:errors/handle-server-validation-error]}}))
 
 (reg-event-fx
   :post-created
@@ -74,7 +74,7 @@
   (fn-traced [{:keys [db]} [_ response]]
     (let [post-data (response->data response)
           post-id (:id post-data)]
-      {:dispatch [:clear-form :POST_api_posts]
+      {:dispatch [:forms/clear-form :POST_api_posts]
        :db (-> db
                (update-in [:posts post-id] merge post-data))
        :navigate-to [:posts]})))

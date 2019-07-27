@@ -1,7 +1,7 @@
 (ns syncrate-kee-frame.posts.views.new-post
   (:require
             [syncrate-kee-frame.components.page-nav :refer [page-nav]]
-            [syncrate-kee-frame.components.form-group :refer [form-group]]
+            [syncrate-kee-frame.components.forms.form-group :refer [form-group]]
             [syncrate-kee-frame.validation :refer [validate post-schema]]
             [reagent.core :as r]
             [re-frame.core :as rf]
@@ -11,15 +11,13 @@
 
 (defn new-post
   []
-  (let [initial-values {:title "" :body ""}
-        form-key :POST_api_posts
-        ;values (r/atom initial-values)
+  (let [form-key :POST_api_posts
         values (rf/subscribe [:form-values form-key])
         save (fn [event vals]
                (.preventDefault event)
                (let [[errors data] (validate vals post-schema)]
                  (if errors
-                   (rf/dispatch [:common/set-validation-errors errors form-key])
+                   (rf/dispatch [:errors/set-validation-errors errors form-key])
                    (rf/dispatch [:create-post @values]))))]
     (fn []
       [:> Box
